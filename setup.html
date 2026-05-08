@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Wonder Wheel</title>
+  <link rel="stylesheet" href="styles.css?v=1.2">
+</head>
+<body class="wizard-body">
+  <main class="wizard-shell">
+    <header class="wizard-header">
+      <div>
+        <p class="kicker">Build a Spinner</p>
+        <h1>Build Your Wonder Wheel</h1>
+        <p class="version-inline">Wonder Wheel v1.2</p>
+      </div>
+      <a class="utility-link inline-link" href="dashboard.html">Back to Dashboard</a>
+    </header>
+
+    <section class="wizard-progress">
+      <div class="wizard-step-pill active" data-step-pill="0">Outer Ring</div>
+      <div class="wizard-step-pill" data-step-pill="1" data-ring-step="middle">Middle Ring</div>
+      <div class="wizard-step-pill" data-step-pill="2" data-ring-step="inner">Inner Ring</div>
+      <div class="wizard-step-pill" data-step-pill="3" data-ring-step="core">Core Ring</div>
+      <div class="wizard-step-pill" data-step-pill="4">Customize</div>
+      <div class="wizard-step-pill" data-step-pill="5">Review</div>
+    </section>
+
+    <form id="wheelWizardForm" class="wizard-card" novalidate>
+      <section class="wizard-step active" data-step="0">
+        <h2>Outer Ring</h2>
+        <p>The outer ring is the largest selector.</p>
+        <label>Wheel Name <input id="wizardName" name="wheelName" type="text" placeholder="Example: Mother's Day Memories" required></label>
+        <label>Number of rings
+          <select id="ringCountSelect">
+            <option value="1">1 ring</option>
+            <option value="2">2 rings</option>
+            <option value="3" selected>3 rings</option>
+            <option value="4">4 rings with Core Ring</option>
+          </select>
+        </label>
+        <label>Number of outer slices <input id="outerCount" name="outerCount" type="number" min="1" max="10" value="6" required></label>
+        <label>Outer ring prompt <input id="outerPrompt" name="outerPrompt" type="text" placeholder="Example: tell a story"></label>
+        <div id="outerInputs" class="wizard-grid"></div>
+      </section>
+
+      <section class="wizard-step" data-step="1" data-ring-step="middle">
+        <h2>Middle Ring</h2>
+        <p>The middle ring creates a second selected result.</p>
+        <label>Number of middle slices <input id="middleCount" name="middleCount" type="number" min="1" max="10" value="6" required></label>
+        <label>Middle ring prompt <input id="middlePrompt" name="middlePrompt" type="text" placeholder="Example: remember"></label>
+        <div id="middleInputs" class="wizard-grid"></div>
+      </section>
+
+      <section class="wizard-step" data-step="2" data-ring-step="inner">
+        <h2>Inner Ring</h2>
+        <p>The inner ring creates a third selected result.</p>
+        <label>Number of inner slices <input id="innerCount" name="innerCount" type="number" min="1" max="10" value="6" required></label>
+        <label>Inner ring prompt <input id="innerPrompt" name="innerPrompt" type="text" placeholder="Example: with gratitude"></label>
+        <div id="innerInputs" class="wizard-grid"></div>
+      </section>
+
+      <section class="wizard-step" data-step="3" data-ring-step="core">
+        <h2>Core Ring</h2>
+        <p>The optional core ring adds a fourth selected result near the center.</p>
+        <label>Number of core slices <input id="coreCount" name="coreCount" type="number" min="1" max="10" value="6" required></label>
+        <label>Core ring prompt <input id="corePrompt" name="corePrompt" type="text" placeholder="Example: today"></label>
+        <div id="coreInputs" class="wizard-grid"></div>
+      </section>
+
+      <section class="wizard-step" data-step="4">
+        <h2>Customize</h2>
+        <div class="wizard-customize-grid">
+          <label>Theme
+            <select id="themeSelect">
+              <option value="lightning">Lightning</option>
+              <option value="plant">Plant</option>
+              <option value="steel">Steel</option>
+              <option value="fire">Fire</option>
+              <option value="earth">Earth</option>
+              <option value="water">Water</option>
+              <option value="flowers">Flowers</option>
+            </select>
+          </label>
+          <label>Wheel line color <input id="wheelColor" type="color" value="#ffd700"></label>
+          <label>Interface color <input id="interfaceColor" type="color" value="#ffd700"></label>
+          <label>Text color <input id="textColor" type="color" value="#ffd700"></label>
+          <label>Page background color <input id="pageBgColor" type="color" value="#111111"></label>
+          <label>Upload page background picture <input id="pageBgImage" type="file" accept="image/*"></label>
+          <label>Wheel size <input id="wheelSize" type="range" min="0.55" max="3" step="0.05" value="1"></label>
+          <label>Center background <input id="centerBg" type="file" accept="image/*"></label>
+          <label>Outer background <input id="outerBg" type="file" accept="image/*"></label>
+          <label data-ring-step="middle">Middle background <input id="middleBg" type="file" accept="image/*"></label>
+          <label data-ring-step="inner">Inner background <input id="innerBg" type="file" accept="image/*"></label>
+          <label id="coreBgLabel" data-ring-step="core">Core background <input id="coreBg" type="file" accept="image/*"></label>
+        </div>
+      </section>
+
+      <section class="wizard-step" data-step="5">
+        <h2>Review</h2>
+        <div id="wizardReview" class="review-box"></div>
+      </section>
+
+      <div class="wizard-actions">
+        <button id="backButton" type="button">Back</button>
+        <button id="nextButton" type="button">Next</button>
+        <button id="finishButton" class="primary-button hidden" type="submit">Create Wheel</button>
+      </div>
+    </form>
+  </main>
+  <script src="setup.js?v=1.2"></script>
+</body>
+</html>
