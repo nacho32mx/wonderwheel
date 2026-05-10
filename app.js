@@ -1,10 +1,12 @@
 const WHEELS_KEY = "skillWheelWheels";
 const ACTIVE_WHEEL_KEY = "skillWheelActiveWheelId";
-const MAX_SLICES = 10;
+const MAX_SLICES = 12;
 const IMAGE_DB_NAME = "skillWheelSpinnerImages";
 const IMAGE_STORE = "images";
-const ALL_RINGS = ["outer", "middle", "inner", "core"];
+const ALL_RINGS = ["outer", "middle", "inner", "core", "fifth", "sixth"];
 const CORE_DEFAULTS = ["Share", "Write", "Record", "Photo", "Call", "Thank You"];
+const EXTRA_DEFAULTS = ["Imagine", "Build", "Ask", "Swap", "Stretch", "Celebrate"];
+const RING_LABELS = { outer: "Outer", middle: "Middle", inner: "Inner", core: "Core", fifth: "Ring 5", sixth: "Ring 6" };
 
 const compass = document.getElementById("compass");
 const centerOrb = document.getElementById("centerOrb");
@@ -17,14 +19,21 @@ const selectedOuter = document.getElementById("selectedOuter");
 const selectedMiddle = document.getElementById("selectedMiddle");
 const selectedInner = document.getElementById("selectedInner");
 const selectedCore = document.getElementById("selectedCore");
+const selectedFifth = document.getElementById("selectedFifth");
+const selectedSixth = document.getElementById("selectedSixth");
 const selectedOuterBox = document.getElementById("selectedOuterBox");
 const selectedMiddleBox = document.getElementById("selectedMiddleBox");
 const selectedInnerBox = document.getElementById("selectedInnerBox");
 const selectedCoreBox = document.getElementById("selectedCoreBox");
+const selectedFifthBox = document.getElementById("selectedFifthBox");
+const selectedSixthBox = document.getElementById("selectedSixthBox");
 const completionPanel = document.getElementById("completionPanel");
 const completionSummary = document.getElementById("completionSummary");
+const completionBody = document.getElementById("completionBody");
 const completionLog = document.getElementById("completionLog");
+const toggleCompletionLog = document.getElementById("toggleCompletionLog");
 const resetCompletionLog = document.getElementById("resetCompletionLog");
+const preventRepeatSelections = document.getElementById("preventRepeatSelections");
 const latestSpinPanel = document.getElementById("latestSpinPanel");
 const latestSpinRows = document.getElementById("latestSpinRows");
 const wheelTitle = document.getElementById("wheelTitle");
@@ -43,6 +52,7 @@ const editor = {
   pageBgImage: document.getElementById("pageBgImageInput"),
   clearPageBgImage: document.getElementById("clearPageBgImage"),
   wheelSize: document.getElementById("wheelSizeInput"),
+  allowAnimations: document.getElementById("allowAnimationsInput"),
   centerBgInput: document.getElementById("centerBgInput"),
   clearCenterBg: document.getElementById("clearCenterBg"),
   ringCount: document.getElementById("ringCountInput"),
@@ -50,37 +60,49 @@ const editor = {
     outer: document.getElementById("outerCountInput"),
     middle: document.getElementById("middleCountInput"),
     inner: document.getElementById("innerCountInput"),
-    core: document.getElementById("coreCountInput")
+    core: document.getElementById("coreCountInput"),
+    fifth: document.getElementById("fifthCountInput"),
+    sixth: document.getElementById("sixthCountInput")
   },
   nameLists: {
     outer: document.getElementById("outerNamesEditor"),
     middle: document.getElementById("middleNamesEditor"),
     inner: document.getElementById("innerNamesEditor"),
-    core: document.getElementById("coreNamesEditor")
+    core: document.getElementById("coreNamesEditor"),
+    fifth: document.getElementById("fifthNamesEditor"),
+    sixth: document.getElementById("sixthNamesEditor")
   },
   prompts: {
     outer: document.getElementById("outerPromptInput"),
     middle: document.getElementById("middlePromptInput"),
     inner: document.getElementById("innerPromptInput"),
-    core: document.getElementById("corePromptInput")
+    core: document.getElementById("corePromptInput"),
+    fifth: document.getElementById("fifthPromptInput"),
+    sixth: document.getElementById("sixthPromptInput")
   },
   bgInputs: {
     outer: document.getElementById("outerBgInput"),
     middle: document.getElementById("middleBgInput"),
     inner: document.getElementById("innerBgInput"),
-    core: document.getElementById("coreBgInput")
+    core: document.getElementById("coreBgInput"),
+    fifth: document.getElementById("fifthBgInput"),
+    sixth: document.getElementById("sixthBgInput")
   },
   clearBg: {
     outer: document.getElementById("clearOuterBg"),
     middle: document.getElementById("clearMiddleBg"),
     inner: document.getElementById("clearInnerBg"),
-    core: document.getElementById("clearCoreBg")
+    core: document.getElementById("clearCoreBg"),
+    fifth: document.getElementById("clearFifthBg"),
+    sixth: document.getElementById("clearSixthBg")
   },
   ringCards: {
     outer: document.getElementById("outerEditorCard"),
     middle: document.getElementById("middleEditorCard"),
     inner: document.getElementById("innerEditorCard"),
-    core: document.getElementById("coreEditorCard")
+    core: document.getElementById("coreEditorCard"),
+    fifth: document.getElementById("fifthEditorCard"),
+    sixth: document.getElementById("sixthEditorCard")
   }
 };
 
@@ -117,10 +139,10 @@ function randomFloat(min = 0, max = 1) {
   return min + Math.random() * (max - min);
 }
 function randomInt(min, max) { return Math.floor(randomFloat(min, max + 1)); }
-function getRingCount() { return Math.max(1, Math.min(4, Number(wheel?.ringCount) || 3)); }
+function getRingCount() { return Math.max(1, Math.min(6, Number(wheel?.ringCount) || 3)); }
 function getActiveRings() { return ALL_RINGS.slice(0, getRingCount()); }
 function isRingActive(ring) { return getActiveRings().includes(ring); }
-function ringDisplayName(ring) { return ring.charAt(0).toUpperCase() + ring.slice(1); }
+function ringDisplayName(ring) { return RING_LABELS[ring] || ring.charAt(0).toUpperCase() + ring.slice(1); }
 function makeSpinProfile() {
   const directions = {};
   const speedVariance = {};
@@ -282,9 +304,9 @@ function queueSaveWheel(delay = 350) {
 }
 function ensureWheelShape() {
   wheel.rings ||= {};
-  wheel.ringCount = Math.max(1, Math.min(4, Number(wheel.ringCount) || 3));
+  wheel.ringCount = Math.max(1, Math.min(6, Number(wheel.ringCount) || 3));
   ALL_RINGS.forEach(ring => {
-    const defaults = ring === "core" ? CORE_DEFAULTS : [`${ring} 1`];
+    const defaults = ring === "core" ? CORE_DEFAULTS : (ring === "fifth" || ring === "sixth" ? EXTRA_DEFAULTS : [`${ring} 1`]);
     wheel.rings[ring] ||= { names: defaults, background: "", backgroundRef: "", rotation: 0 };
     if (!Array.isArray(wheel.rings[ring].names) || !wheel.rings[ring].names.length) wheel.rings[ring].names = defaults;
     wheel.rings[ring].names = wheel.rings[ring].names.slice(0, MAX_SLICES);
@@ -300,6 +322,8 @@ function ensureWheelShape() {
   wheel.center.backgroundRef ||= "";
   wheel.completed ||= [];
   if (!Array.isArray(wheel.completed)) wheel.completed = [];
+  wheel.preventRepeatSelections = Boolean(wheel.preventRepeatSelections);
+  wheel.allowAnimations = wheel.allowAnimations !== false;
   wheel.theme ||= "lightning";
   wheel.sizeScale = clamp(wheel.sizeScale || 1, 0.45, MAX_WHEEL_SCALE);
 }
@@ -386,7 +410,9 @@ function updateSelectedPanel() {
     outer: { box: selectedOuterBox, value: selectedOuter },
     middle: { box: selectedMiddleBox, value: selectedMiddle },
     inner: { box: selectedInnerBox, value: selectedInner },
-    core: { box: selectedCoreBox, value: selectedCore }
+    core: { box: selectedCoreBox, value: selectedCore },
+    fifth: { box: selectedFifthBox, value: selectedFifth },
+    sixth: { box: selectedSixthBox, value: selectedSixth }
   };
   ALL_RINGS.forEach(ring => {
     fields[ring].box?.classList.toggle("hidden", !isRingActive(ring));
@@ -423,21 +449,31 @@ function getCompletedKeys() { return new Set((wheel.completed || []).map(item =>
 function findUnusedCombination() {
   const completed = getCompletedKeys();
   const rings = getActiveRings();
-  const candidates = [];
-  const collect = (ringIndex, indexes, names) => {
-    if (ringIndex >= rings.length) {
-      const key = comboKeyFromNames(names);
-      if (!completed.has(key)) candidates.push({ indexes, names, key });
-      return;
-    }
-    const ring = rings[ringIndex];
-    const ringNames = getRingNames(ring);
-    for (let index = 0; index < ringNames.length; index++) {
-      collect(ringIndex + 1, { ...indexes, [ring]: index }, [...names, ringNames[index]]);
-    }
+  const ringNames = rings.map(ring => getRingNames(ring));
+  const total = ringNames.reduce((value, names) => value * names.length, 1);
+  if (!total || completed.size >= total) return null;
+  const comboFromOffset = offset => {
+    const indexes = {};
+    const names = [];
+    rings.forEach((ring, ringIndex) => {
+      const namesForRing = ringNames[ringIndex];
+      const index = offset % namesForRing.length;
+      offset = Math.floor(offset / namesForRing.length);
+      indexes[ring] = index;
+      names.push(namesForRing[index]);
+    });
+    return { indexes, names, key: comboKeyFromNames(names) };
   };
-  collect(0, {}, []);
-  return candidates.length ? candidates[randomInt(0, candidates.length - 1)] : null;
+  for (let attempt = 0; attempt < 80; attempt++) {
+    const combo = comboFromOffset(randomInt(0, total - 1));
+    if (!completed.has(combo.key)) return combo;
+  }
+  const start = randomInt(0, total - 1);
+  for (let scanned = 0; scanned < total; scanned++) {
+    const combo = comboFromOffset((start + scanned) % total);
+    if (!completed.has(combo.key)) return combo;
+  }
+  return null;
 }
 function setSelectedIndexes(indexes) {
   getActiveRings().forEach(ring => {
@@ -461,8 +497,10 @@ function renderCompletionLog() {
   if (!completionSummary || !completionLog) return;
   const total = getTotalCombinations();
   const completed = wheel.completed || [];
-  completionSummary.textContent = `${completed.length} / ${total}`;
-  completionPanel?.classList.toggle("complete", total > 0 && completed.length >= total);
+  if (preventRepeatSelections) preventRepeatSelections.checked = Boolean(wheel.preventRepeatSelections);
+  const uniqueCompleted = getCompletedKeys().size;
+  completionSummary.textContent = wheel.preventRepeatSelections ? `${uniqueCompleted} / ${total}` : `${completed.length} spins`;
+  completionPanel?.classList.toggle("complete", Boolean(wheel.preventRepeatSelections) && total > 0 && uniqueCompleted >= total);
   completionLog.innerHTML = completed.slice(-24).reverse().map(item => `
     <li><span>${escapeHtml((item.displayNames || item.names)?.join(" + ") || item.key || "")}</span></li>`).join("");
 }
@@ -470,6 +508,12 @@ function completeCurrentCombination() {
   const total = getTotalCombinations();
   if (!total) return null;
   wheel.completed ||= [];
+  if (!wheel.preventRepeatSelections) {
+    const combo = getCurrentCombination();
+    wheel.completed.push({ key: combo.key, names: combo.names, displayNames: combo.displayNames, completedAt: new Date().toISOString() });
+    renderCompletionLog();
+    return combo;
+  }
   const completed = getCompletedKeys();
   let combo = getCurrentCombination();
   if (completed.has(combo.key)) {
@@ -491,6 +535,7 @@ function completeCurrentCombination() {
   return combo;
 }
 function flashSelectedFields() {
+  if (!animationsAllowed()) return;
   document.querySelectorAll(".selected-grid div:not(.hidden)").forEach(field => {
     field.classList.remove("selected-field-flash");
     void field.offsetWidth;
@@ -506,14 +551,21 @@ function flashSelectedFields() {
     label?.classList.add("selected-slice-label-flash");
   });
 }
+function animationsAllowed() { return wheel?.allowAnimations !== false; }
 function setThemeSpiralActive(active) {
   if (!themeSpiralEffect) return;
   clearTimeout(spiralTimer);
+  if (active && !animationsAllowed()) {
+    themeSpiralEffect.classList.remove("active");
+    compass?.classList.remove("layer-spin-active");
+    return;
+  }
   themeSpiralEffect.classList.toggle("active", active);
   compass?.classList.toggle("layer-spin-active", active);
   themeSpiralEffect.setAttribute("data-theme", wheel?.theme || "lightning");
 }
 function pulseThemeSpiral(duration = 600) {
+  if (!animationsAllowed()) return;
   setThemeSpiralActive(true);
   clearTimeout(spiralTimer);
   spiralTimer = setTimeout(() => setThemeSpiralActive(false), duration);
@@ -531,7 +583,7 @@ function themeColors() {
   }
 }
 function spawnSpinParticles() {
-  if (!spiralLayer) return;
+  if (!spiralLayer || !animationsAllowed()) return;
   const speed = Math.max(...getActiveRings().map(ring => Math.abs(velocities[ring] || 0)));
   if (speed < 1.1) return;
   const colors = themeColors();
@@ -558,7 +610,7 @@ function spawnSpinParticles() {
   }
 }
 function spawnEdgeSparks() {
-  if (!spiralLayer) return;
+  if (!spiralLayer || !animationsAllowed()) return;
   const speed = Math.max(...getActiveRings().map(ring => Math.abs(velocities[ring] || 0)));
   if (speed < 1.4) return;
   const colors = themeColors();
@@ -584,7 +636,7 @@ function spawnEdgeSparks() {
   }
 }
 function spawnFinishConfetti() {
-  if (!spiralLayer || !compass) return;
+  if (!spiralLayer || !compass || !animationsAllowed()) return;
   const colors = themeColors();
   const rect = compass.getBoundingClientRect();
   const originX = rect.left + rect.width / 2;
@@ -676,7 +728,7 @@ function updateChargeUi() {
   });
   updateWheelRotations();
   powerBarFill.style.width = `${power * 100}%`;
-  centerOrb.classList.toggle("max-charge", power >= 1);
+  centerOrb.classList.toggle("max-charge", animationsAllowed() && power >= 1);
   requestAnimationFrame(updateChargeUi);
 }
 function startCharge(event) {
@@ -710,23 +762,27 @@ function endCharge(event) {
 function middleClickReset(event) {
   if (event.button !== 1) return;
   event.preventDefault();
-  const targetRing = event.target.closest(".outer-ring, .middle-ring, .inner-ring-simple, .core-ring, .center-orb");
+  const targetRing = event.target.closest(".outer-ring, .middle-ring, .inner-ring-simple, .core-ring, .fifth-ring, .sixth-ring, .center-orb");
   if (!targetRing) return;
   if (targetRing.classList.contains("outer-ring")) rotations.outer = 0;
   else if (targetRing.classList.contains("middle-ring")) rotations.middle = 0;
   else if (targetRing.classList.contains("inner-ring-simple")) rotations.inner = 0;
   else if (targetRing.classList.contains("core-ring")) rotations.core = 0;
+  else if (targetRing.classList.contains("fifth-ring")) rotations.fifth = 0;
+  else if (targetRing.classList.contains("sixth-ring")) rotations.sixth = 0;
   else rotations = makeRingState();
   updateWheelRotations();
   saveWheel();
 }
 function ringFromElement(element) {
-  const ringEl = element?.closest?.(".outer-ring, .middle-ring, .inner-ring-simple, .core-ring");
+  const ringEl = element?.closest?.(".outer-ring, .middle-ring, .inner-ring-simple, .core-ring, .fifth-ring, .sixth-ring");
   if (!ringEl) return "";
   if (ringEl.classList.contains("outer-ring")) return "outer";
   if (ringEl.classList.contains("middle-ring")) return "middle";
   if (ringEl.classList.contains("inner-ring-simple")) return "inner";
   if (ringEl.classList.contains("core-ring")) return "core";
+  if (ringEl.classList.contains("fifth-ring")) return "fifth";
+  if (ringEl.classList.contains("sixth-ring")) return "sixth";
   return "";
 }
 function angleFromCenter(event) {
@@ -851,7 +907,7 @@ function getEditorNames(ring) {
   return getRingNames(ring);
 }
 function updateEditorRingVisibility() {
-  const count = Math.max(1, Math.min(4, Number(editor.ringCount?.value) || getRingCount()));
+  const count = Math.max(1, Math.min(6, Number(editor.ringCount?.value) || getRingCount()));
   ALL_RINGS.forEach((ring, index) => editor.ringCards[ring]?.classList.toggle("hidden", index >= count));
 }
 function openEditor() {
@@ -864,6 +920,7 @@ function openEditor() {
   editor.pageBg.value = wheel.colors.pageBg || "#111111";
   if (editor.ringCount) editor.ringCount.value = String(getRingCount());
   if (editor.wheelSize) editor.wheelSize.value = String(wheel.sizeScale || 1);
+  if (editor.allowAnimations) editor.allowAnimations.checked = wheel.allowAnimations !== false;
   ALL_RINGS.forEach(ring => {
     editor.counts[ring].value = String(getRingNames(ring).length);
     if (editor.prompts[ring]) editor.prompts[ring].value = getRingPrompt(ring);
@@ -902,8 +959,9 @@ async function saveEditor() {
     wheel.name = editor.name.value.trim() || "Untitled Wheel";
     wheel.theme = editor.theme.value;
     const previousSignature = JSON.stringify({ ringCount: getRingCount(), rings: getActiveRings().map(ring => getRingNames(ring)) });
-    wheel.ringCount = Math.max(1, Math.min(4, Number(editor.ringCount?.value) || 3));
+    wheel.ringCount = Math.max(1, Math.min(6, Number(editor.ringCount?.value) || 3));
     ensureWheelShape();
+    wheel.allowAnimations = editor.allowAnimations ? editor.allowAnimations.checked : true;
     wheel.sizeScale = clamp(editor.wheelSize?.value || wheel.sizeScale || 1, 0.45, MAX_WHEEL_SCALE);
     wheel.colors = { ...wheel.colors, wheel: editor.wheelColor.value, interface: editor.interfaceColor.value, text: editor.textColor.value, pageBg: editor.pageBg.value };
     ALL_RINGS.forEach(ring => {
@@ -966,6 +1024,18 @@ resetCompletionLog?.addEventListener("click", event => {
   event.stopPropagation();
   if (!confirm("Reset the completed combination log for this wheel?")) return;
   wheel.completed = [];
+  saveWheel();
+  renderCompletionLog();
+});
+toggleCompletionLog?.addEventListener("click", event => {
+  event.stopPropagation();
+  completionPanel?.classList.toggle("collapsed");
+  const collapsed = completionPanel?.classList.contains("collapsed");
+  toggleCompletionLog.textContent = collapsed ? "Show" : "Hide";
+});
+preventRepeatSelections?.addEventListener("change", event => {
+  event.stopPropagation();
+  wheel.preventRepeatSelections = preventRepeatSelections.checked;
   saveWheel();
   renderCompletionLog();
 });

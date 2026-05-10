@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wonder Wheel Dashboard</title>
-  <link rel="stylesheet" href="styles.css?v=1.2">
+  <link rel="stylesheet" href="styles.css?v=1.3">
 </head>
 <body class="dashboard-body">
   <main class="dashboard-shell">
@@ -12,12 +12,12 @@
       <div>
         <p class="kicker">Custom Spinner Tool</p>
         <h1>Wonder Wheel</h1>
-        <p class="version-inline">Wonder Wheel v1.2</p>
+        <p class="version-inline">Wonder Wheel v1.3</p>
         <p>Build, customize, and spin multi-ring wheels for games, prompts, choices, and storytelling.</p>
       </div>
       <div class="dashboard-header-actions">
         <button id="aboutButton" type="button">About</button>
-        <button id="dashboardCustomizeToggle" type="button">Customize Tables</button>
+        <button id="dashboardCustomizeToggle" type="button">Customize</button>
         <a class="primary-link" href="setup.html?mode=new">Build New Wheel</a>
       </div>
     </header>
@@ -27,7 +27,9 @@
       <div class="control-row wrap">
         <label>Table color <input type="color" id="dashboardTableColor" value="#ffd700"></label>
         <label>Interface color <input type="color" id="dashboardInterfaceColor" value="#ffd700"></label>
-        <label>Background <input type="color" id="dashboardBgColor" value="#111111"></label>
+        <label>Background color <input type="color" id="dashboardBgColor" value="#111111"></label>
+        <label>Background image <input type="file" id="dashboardBgImage" accept="image/*"></label>
+        <button id="clearDashboardBgImage" type="button">Clear Background Image</button>
         <button id="resetDashboardColors" type="button">Reset</button>
       </div>
     </section>
@@ -50,14 +52,14 @@
       <button id="closeAboutButton" class="modal-close" type="button">×</button>
       <h2>About Wonder Wheel</h2>
       <p>Wonder Wheel is a visual, interactive spinner for creating playful prompts, choices, and experiences.</p>
-      <p>Each wheel can contain one to four customizable rings. The top pointer selects one slice from each active ring, creating surprising combinations.</p>
+      <p>Each wheel can contain one to six customizable rings. The top pointer selects one slice from each active ring, creating surprising combinations.</p>
       <h3>How It Works</h3>
-      <p>Build your rings, customize the look, hold the center to charge the spin, then release. The wheel selects a combination from the outer, middle, inner, and optional core rings.</p>
+      <p>Build your rings, customize the look, hold the center to charge the spin, then release. The wheel selects a combination from each active ring.</p>
       <p>This version is designed as a flexible tool for storytelling games, family activities, decision wheels, party prompts, creative exercises, and more.</p>
       <p class="tagline">spin. select. play.</p>
     </div>
   </div>
 
-  <script src="dashboard.js?v=1.2"></script>
+  <script src="dashboard.js?v=1.3"></script>
 </body>
 </html>

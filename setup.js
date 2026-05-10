@@ -1,6 +1,6 @@
 const WHEELS_KEY = "skillWheelWheels";
 const ACTIVE_WHEEL_KEY = "skillWheelActiveWheelId";
-const MAX_SLICES = 10;
+const MAX_SLICES = 12;
 const IMAGE_DB_NAME = "skillWheelSpinnerImages";
 const IMAGE_STORE = "images";
 
@@ -20,21 +20,26 @@ const pageBgColor = document.getElementById("pageBgColor");
 const pageBgImage = document.getElementById("pageBgImage");
 const centerBg = document.getElementById("centerBg");
 const wheelSize = document.getElementById("wheelSize");
+const allowAnimations = document.getElementById("allowAnimations");
 const ringCountSelect = document.getElementById("ringCountSelect");
-const coreBgLabel = document.getElementById("coreBgLabel");
-const RINGS = ["outer", "middle", "inner", "core"];
-const countInputs = { outer: document.getElementById("outerCount"), middle: document.getElementById("middleCount"), inner: document.getElementById("innerCount"), core: document.getElementById("coreCount") };
-const promptInputs = { outer: document.getElementById("outerPrompt"), middle: document.getElementById("middlePrompt"), inner: document.getElementById("innerPrompt"), core: document.getElementById("corePrompt") };
-const inputContainers = { outer: document.getElementById("outerInputs"), middle: document.getElementById("middleInputs"), inner: document.getElementById("innerInputs"), core: document.getElementById("coreInputs") };
-const bgInputs = { outer: document.getElementById("outerBg"), middle: document.getElementById("middleBg"), inner: document.getElementById("innerBg"), core: document.getElementById("coreBg") };
+const RINGS = ["outer", "middle", "inner", "core", "fifth", "sixth"];
+const countInputs = { outer: document.getElementById("outerCount"), middle: document.getElementById("middleCount"), inner: document.getElementById("innerCount"), core: document.getElementById("coreCount"), fifth: document.getElementById("fifthCount"), sixth: document.getElementById("sixthCount") };
+const promptInputs = { outer: document.getElementById("outerPrompt"), middle: document.getElementById("middlePrompt"), inner: document.getElementById("innerPrompt"), core: document.getElementById("corePrompt"), fifth: document.getElementById("fifthPrompt"), sixth: document.getElementById("sixthPrompt") };
+const inputContainers = { outer: document.getElementById("outerInputs"), middle: document.getElementById("middleInputs"), inner: document.getElementById("innerInputs"), core: document.getElementById("coreInputs"), fifth: document.getElementById("fifthInputs"), sixth: document.getElementById("sixthInputs") };
+const bgInputs = { outer: document.getElementById("outerBg"), middle: document.getElementById("middleBg"), inner: document.getElementById("innerBg"), core: document.getElementById("coreBg"), fifth: document.getElementById("fifthBg"), sixth: document.getElementById("sixthBg") };
 const DEFAULTS = {
   outer: ["Mom", "Dad", "Kirstie", "Tyler", "Greta", "Home"],
   middle: ["Trip", "Gathering", "Holiday", "Food", "Photos", "Music"],
   inner: ["Funny Story", "Compliment", "Memory", "Grateful", "Wisdom", "Adventure"],
-  core: ["Share", "Write", "Record", "Photo", "Call", "Thank You"]
+  core: ["Share", "Write", "Record", "Photo", "Call", "Thank You"],
+  fifth: ["Imagine", "Build", "Ask", "Swap", "Stretch", "Celebrate"],
+  sixth: ["Today", "Tomorrow", "Together", "Solo", "Fast", "Slow"]
 };
 let currentStep = 0;
-let backgrounds = { outer: "", middle: "", inner: "", core: "", page: "", center: "" };
+let backgrounds = { outer: "", middle: "", inner: "", core: "", fifth: "", sixth: "", page: "", center: "" };
+const params = new URLSearchParams(window.location.search);
+const editWheelId = params.get("mode") === "edit" ? params.get("id") || localStorage.getItem(ACTIVE_WHEEL_KEY) : "";
+let editingWheel = null;
 
 function openImageDb() {
   return new Promise((resolve, reject) => {
@@ -57,6 +62,18 @@ async function putStoredImage(key, dataUrl) {
     tx.onerror = () => { db.close(); reject(tx.error); };
   });
 }
+async function deleteStoredImage(key) {
+  if (!key) return;
+  try {
+    const db = await openImageDb();
+    await new Promise(resolve => {
+      const tx = db.transaction(IMAGE_STORE, "readwrite");
+      tx.objectStore(IMAGE_STORE).delete(key);
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); resolve(); };
+    });
+  } catch {}
+}
 function stripLargeImageData(value) {
   if (typeof value === "string" && value.startsWith("data:image/")) return "";
   if (Array.isArray(value)) return value.map(stripLargeImageData);
@@ -78,8 +95,10 @@ function writeJson(key, value) {
 }
 function clampCount(value) { return Math.max(1, Math.min(MAX_SLICES, Math.round(Number(value) || 1))); }
 function clamp(value, min, max) { return Math.max(min, Math.min(max, Number(value) || min)); }
-function ringLabel(ring) { return ring.charAt(0).toUpperCase() + ring.slice(1); }
-function getRingCount() { return Math.max(1, Math.min(4, Number(ringCountSelect?.value) || 3)); }
+function ringLabel(ring) {
+  return ({ outer: "Outer", middle: "Middle", inner: "Inner", core: "Core", fifth: "Ring 5", sixth: "Ring 6" })[ring] || ring.charAt(0).toUpperCase() + ring.slice(1);
+}
+function getRingCount() { return Math.max(1, Math.min(6, Number(ringCountSelect?.value) || 3)); }
 function getActiveRings() { return RINGS.slice(0, getRingCount()); }
 function isRingActive(ring) { return getActiveRings().includes(ring); }
 function isStepAvailable(step) {
@@ -100,6 +119,22 @@ function currentNames(ring) {
     .slice(0, MAX_SLICES);
 }
 function currentPrompt(ring) { return promptInputs[ring]?.value.trim() || ""; }
+function setRingNames(ring, names) {
+  const safeNames = Array.isArray(names) && names.length ? names.slice(0, MAX_SLICES) : DEFAULTS[ring];
+  countInputs[ring].value = String(Math.max(1, Math.min(MAX_SLICES, safeNames.length || 1)));
+  inputContainers[ring].innerHTML = "";
+  for (let index = 0; index < Number(countInputs[ring].value); index++) {
+    const label = document.createElement("label");
+    label.textContent = `${ringLabel(ring)} Slice ${index + 1}`;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = `${ring}Slice${index + 1}`;
+    input.maxLength = 38;
+    input.value = safeNames[index] || DEFAULTS[ring][index] || `${ringLabel(ring)} ${index + 1}`;
+    label.appendChild(input);
+    inputContainers[ring].appendChild(label);
+  }
+}
 function renderNameInputs(ring) {
   const count = clampCount(countInputs[ring].value);
   countInputs[ring].value = String(count);
@@ -116,6 +151,39 @@ function renderNameInputs(ring) {
     label.appendChild(input);
     inputContainers[ring].appendChild(label);
   }
+}
+function getWheelSignatureFrom(wheel) {
+  const count = Math.max(1, Math.min(6, Number(wheel?.ringCount) || 3));
+  return JSON.stringify({
+    ringCount: count,
+    rings: RINGS.slice(0, count).map(ring => Array.isArray(wheel?.rings?.[ring]?.names) ? wheel.rings[ring].names.filter(Boolean) : [])
+  });
+}
+function loadEditWheel() {
+  if (!editWheelId) return;
+  const wheels = readJson(WHEELS_KEY, []);
+  editingWheel = wheels.find(wheel => wheel.id === editWheelId) || null;
+  if (!editingWheel) {
+    alert("Unable to find that wheel for editing.");
+    window.location.href = "dashboard.html";
+    return;
+  }
+  document.querySelector(".wizard-header h1").textContent = "Edit Wonder Wheel";
+  finishButton.textContent = "Save Wheel";
+  nameInput.value = editingWheel.name || "";
+  ringCountSelect.value = String(Math.max(1, Math.min(6, Number(editingWheel.ringCount) || 3)));
+  themeSelect.value = editingWheel.theme || "lightning";
+  wheelColor.value = editingWheel.colors?.wheel || "#ffd700";
+  interfaceColor.value = editingWheel.colors?.interface || "#ffd700";
+  textColor.value = editingWheel.colors?.text || "#ffd700";
+  pageBgColor.value = editingWheel.colors?.pageBg || "#111111";
+  wheelSize.value = String(clamp(Number(editingWheel.sizeScale) || 1, 0.45, 3));
+  if (allowAnimations) allowAnimations.checked = editingWheel.allowAnimations !== false;
+  RINGS.forEach(ring => {
+    promptInputs[ring].value = editingWheel.rings?.[ring]?.prompt || "";
+    setRingNames(ring, editingWheel.rings?.[ring]?.names || DEFAULTS[ring]);
+  });
+  localStorage.setItem(ACTIVE_WHEEL_KEY, editingWheel.id);
 }
 function updateStep() {
   RINGS.forEach(ring => {
@@ -145,7 +213,7 @@ function validateStep(stepIndex) {
   if (stepIndex === 0 && !nameInput.value.trim()) {
     return showFieldError(nameInput, "Please enter a wheel name.", 0);
   }
-  const ringByStep = { 0: "outer", 1: "middle", 2: "inner", 3: "core" };
+  const ringByStep = { 0: "outer", 1: "middle", 2: "inner", 3: "core", 4: "fifth", 5: "sixth" };
   const ring = ringByStep[stepIndex];
   if (ring) {
     if (!isRingActive(ring)) return true;
@@ -175,7 +243,8 @@ function renderReview() {
     ${getActiveRings().map(ring => `
       <p><strong>${ringLabel(ring)} prompt:</strong> ${escapeHtml(currentPrompt(ring) || "No prompt")}</p>
       <p><strong>${ringLabel(ring)} slices:</strong> ${currentNames(ring).map(escapeHtml).join(", ")}</p>`).join("")}
-    <p><strong>Theme:</strong> ${escapeHtml(themeSelect.value)}</p>`;
+    <p><strong>Theme:</strong> ${escapeHtml(themeSelect.value)}</p>
+    <p><strong>Animations:</strong> ${allowAnimations?.checked ? "Allowed" : "Off"}</p>`;
 }
 function escapeHtml(value) { return String(value ?? "").replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[char])); }
 function readFileAsDataUrl(file, callback) {
@@ -246,11 +315,18 @@ form.addEventListener("submit", async event => {
   event.preventDefault();
   if (!validateWizard()) return;
   finishButton.disabled = true;
-  finishButton.textContent = "Creating...";
+  finishButton.textContent = editingWheel ? "Saving..." : "Creating...";
   try {
-    const id = `wheel-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const id = editingWheel?.id || `wheel-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     const activeRings = getActiveRings();
-    const refs = { outer: "", middle: "", inner: "", core: "", page: "", center: "" };
+    const refs = { outer: "", middle: "", inner: "", core: "", fifth: "", sixth: "", page: "", center: "" };
+    activeRings.forEach(ring => refs[ring] = editingWheel?.rings?.[ring]?.backgroundRef || "");
+    refs.page = editingWheel?.colors?.pageBgImageRef || "";
+    refs.center = editingWheel?.center?.backgroundRef || "";
+
+    for (const ring of RINGS.filter(ring => !activeRings.includes(ring))) {
+      await deleteStoredImage(editingWheel?.rings?.[ring]?.backgroundRef);
+    }
     for (const part of [...activeRings, "page", "center"]) {
       if (backgrounds[part]) {
         const key = `${id}:${part}`;
@@ -258,13 +334,15 @@ form.addEventListener("submit", async event => {
         refs[part] = key;
       }
     }
+    const previousSignature = editingWheel ? getWheelSignatureFrom(editingWheel) : "";
     const wheel = {
       id,
       name: nameInput.value.trim() || "Untitled Wheel",
-      createdAt: new Date().toISOString(),
+      createdAt: editingWheel?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       ringCount: getRingCount(),
       theme: themeSelect.value,
+      allowAnimations: allowAnimations ? allowAnimations.checked : true,
       sizeScale: clamp(Number(wheelSize?.value) || 1, 0.45, 3),
       colors: {
         wheel: wheelColor.value,
@@ -276,20 +354,32 @@ form.addEventListener("submit", async event => {
       center: { background: "", backgroundRef: refs.center },
       rings: Object.fromEntries(activeRings.map(ring => [
         ring,
-        { names: currentNames(ring), prompt: currentPrompt(ring), background: "", backgroundRef: refs[ring], rotation: 0 }
-      ]))
+        {
+          names: currentNames(ring),
+          prompt: currentPrompt(ring),
+          background: "",
+          backgroundRef: refs[ring],
+          rotation: Number(editingWheel?.rings?.[ring]?.rotation) || 0
+        }
+      ])),
+      completed: Array.isArray(editingWheel?.completed) ? editingWheel.completed : [],
+      preventRepeatSelections: Boolean(editingWheel?.preventRepeatSelections)
     };
     const wheels = readJson(WHEELS_KEY, []);
-    wheels.push(wheel);
-    if (!writeJson(WHEELS_KEY, wheels)) return;
+    const nextSignature = getWheelSignatureFrom(wheel);
+    if (editingWheel && previousSignature !== nextSignature) wheel.completed = [];
+    const nextWheels = editingWheel ? wheels.map(item => item.id === id ? wheel : item) : [...wheels, wheel];
+    if (editingWheel && !nextWheels.some(item => item.id === id)) nextWheels.push(wheel);
+    if (!writeJson(WHEELS_KEY, nextWheels)) return;
     localStorage.setItem(ACTIVE_WHEEL_KEY, id);
     window.location.href = "index.html";
   } catch (error) {
     console.error(error);
-    alert("Unable to create the wheel. Try a smaller image or a different browser.");
+    alert(`Unable to ${editingWheel ? "save" : "create"} the wheel. Try a smaller image or a different browser.`);
   } finally {
     finishButton.disabled = false;
-    finishButton.textContent = "Create Wheel";
+    finishButton.textContent = editingWheel ? "Save Wheel" : "Create Wheel";
   }
 });
+loadEditWheel();
 updateStep();

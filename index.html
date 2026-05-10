@@ -4,20 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wonder Wheel Spinner</title>
-  <link rel="stylesheet" href="styles.css?v=1.2">
+  <link rel="stylesheet" href="styles.css?v=1.3">
 </head>
 <body class="wheel-body">
-  <a class="utility-link top-left" href="dashboard.html">Dashboard</a>
-  <button id="editWheelButton" class="utility-link top-right" type="button">Edit Wheel</button>
-  <div class="version-badge">Wonder Wheel v1.2</div>
+  <div class="top-left-actions">
+    <a class="utility-link" href="dashboard.html">Dashboard</a>
+    <button id="editWheelButton" class="utility-link" type="button">Edit Wheel</button>
+  </div>
+  <div class="version-badge">Wonder Wheel v1.3</div>
 
   <section id="selectedPanel" class="selected-panel draggable-panel">
     <div class="panel-handle">Selected</div>
     <div class="selected-grid">
-      <div id="selectedOuterBox"><span>Outer</span><strong id="selectedOuter">—</strong></div>
-      <div id="selectedMiddleBox"><span>Middle</span><strong id="selectedMiddle">—</strong></div>
-      <div id="selectedInnerBox"><span>Inner</span><strong id="selectedInner">—</strong></div>
-      <div id="selectedCoreBox" class="hidden"><span>Core</span><strong id="selectedCore">—</strong></div>
+      <div id="selectedOuterBox"><span>Ring 1</span><strong id="selectedOuter">—</strong></div>
+      <div id="selectedMiddleBox"><span>Ring 2</span><strong id="selectedMiddle">—</strong></div>
+      <div id="selectedInnerBox"><span>Ring 3</span><strong id="selectedInner">—</strong></div>
+      <div id="selectedCoreBox" class="hidden"><span>Ring 4</span><strong id="selectedCore">—</strong></div>
+      <div id="selectedFifthBox" class="hidden"><span>Ring 5</span><strong id="selectedFifth">-</strong></div>
+      <div id="selectedSixthBox" class="hidden"><span>Ring 6</span><strong id="selectedSixth">-</strong></div>
     </div>
     <div id="latestSpinPanel" class="latest-spin-panel hidden">
       <h3>Latest Spin</h3>
@@ -31,9 +35,15 @@
         <div class="panel-handle">Completed</div>
         <p id="completionSummary">0 / 0</p>
       </div>
-      <button id="resetCompletionLog" type="button">Reset</button>
+      <div class="completion-actions">
+        <button id="toggleCompletionLog" type="button">Hide</button>
+        <button id="resetCompletionLog" type="button">Reset</button>
+      </div>
     </div>
-    <ol id="completionLog" class="completion-log"></ol>
+    <div id="completionBody" class="completion-body">
+      <label class="checkbox-row"><input id="preventRepeatSelections" type="checkbox"> Prevent repeat selections</label>
+      <ol id="completionLog" class="completion-log"></ol>
+    </div>
   </section>
 
   <section id="editorPanel" class="editor-panel hidden">
@@ -48,7 +58,9 @@
           <option value="1">1 ring</option>
           <option value="2">2 rings</option>
           <option value="3" selected>3 rings</option>
-          <option value="4">4 rings with Core Ring</option>
+          <option value="4">4 rings</option>
+          <option value="5">5 rings</option>
+          <option value="6">6 rings</option>
         </select>
       </label>
       <label>Theme
@@ -67,15 +79,16 @@
       <label>Text color <input id="textColorInput" type="color"></label>
       <label>Page background color <input id="pageBgInput" type="color"></label>
       <label>Full page background image <input id="pageBgImageInput" type="file" accept="image/*"></label>
-      <button id="clearPageBgImage" type="button">Clear Full Page Background</button>
+      <button id="clearPageBgImage" class="compact-editor-button" type="button">Clear Background</button>
       <label>Wheel size <input id="wheelSizeInput" type="range" min="0.45" max="3" step="0.025"></label>
+      <label class="checkbox-row editor-checkbox"><input id="allowAnimationsInput" type="checkbox"> Allow animations</label>
       <label>Center background <input id="centerBgInput" type="file" accept="image/*"></label>
-      <button id="clearCenterBg" type="button">Clear Center Background</button>
+      <button id="clearCenterBg" class="compact-editor-button" type="button">Clear Background</button>
     </div>
     <div class="editor-ring-grid">
       <div id="outerEditorCard" class="editor-ring-card">
         <h3>Outer Ring</h3>
-        <label>Slices <input id="outerCountInput" type="number" min="1" max="10"></label>
+        <label>Slices <input id="outerCountInput" type="number" min="1" max="12"></label>
         <label>Prompt <input id="outerPromptInput" type="text" placeholder="Example: tell a story"></label>
         <div id="outerNamesEditor" class="name-editor-list"></div>
         <label>Background <input id="outerBgInput" type="file" accept="image/*"></label>
@@ -83,7 +96,7 @@
       </div>
       <div id="middleEditorCard" class="editor-ring-card">
         <h3>Middle Ring</h3>
-        <label>Slices <input id="middleCountInput" type="number" min="1" max="10"></label>
+        <label>Slices <input id="middleCountInput" type="number" min="1" max="12"></label>
         <label>Prompt <input id="middlePromptInput" type="text" placeholder="Example: remember"></label>
         <div id="middleNamesEditor" class="name-editor-list"></div>
         <label>Background <input id="middleBgInput" type="file" accept="image/*"></label>
@@ -91,7 +104,7 @@
       </div>
       <div id="innerEditorCard" class="editor-ring-card">
         <h3>Inner Ring</h3>
-        <label>Slices <input id="innerCountInput" type="number" min="1" max="10"></label>
+        <label>Slices <input id="innerCountInput" type="number" min="1" max="12"></label>
         <label>Prompt <input id="innerPromptInput" type="text" placeholder="Example: with gratitude"></label>
         <div id="innerNamesEditor" class="name-editor-list"></div>
         <label>Background <input id="innerBgInput" type="file" accept="image/*"></label>
@@ -99,11 +112,27 @@
       </div>
       <div id="coreEditorCard" class="editor-ring-card">
         <h3>Core Ring</h3>
-        <label>Slices <input id="coreCountInput" type="number" min="1" max="10"></label>
+        <label>Slices <input id="coreCountInput" type="number" min="1" max="12"></label>
         <label>Prompt <input id="corePromptInput" type="text" placeholder="Example: today"></label>
         <div id="coreNamesEditor" class="name-editor-list"></div>
         <label>Background <input id="coreBgInput" type="file" accept="image/*"></label>
         <button id="clearCoreBg" type="button">Clear Background</button>
+      </div>
+      <div id="fifthEditorCard" class="editor-ring-card">
+        <h3>Ring 5</h3>
+        <label>Slices <input id="fifthCountInput" type="number" min="1" max="12"></label>
+        <label>Prompt <input id="fifthPromptInput" type="text" placeholder="Example: in a new way"></label>
+        <div id="fifthNamesEditor" class="name-editor-list"></div>
+        <label>Background <input id="fifthBgInput" type="file" accept="image/*"></label>
+        <button id="clearFifthBg" type="button">Clear Background</button>
+      </div>
+      <div id="sixthEditorCard" class="editor-ring-card">
+        <h3>Ring 6</h3>
+        <label>Slices <input id="sixthCountInput" type="number" min="1" max="12"></label>
+        <label>Prompt <input id="sixthPromptInput" type="text" placeholder="Example: before bedtime"></label>
+        <div id="sixthNamesEditor" class="name-editor-list"></div>
+        <label>Background <input id="sixthBgInput" type="file" accept="image/*"></label>
+        <button id="clearSixthBg" type="button">Clear Background</button>
       </div>
     </div>
     <button id="saveEditorButton" class="primary-button" type="button">Save Changes</button>
@@ -137,6 +166,18 @@
         <div class="ring-labels" id="coreLabels"></div>
       </div>
 
+      <div class="ring fifth-ring" id="fifthRing">
+        <div class="ring-bg"></div>
+        <div class="ring-lines"></div>
+        <div class="ring-labels" id="fifthLabels"></div>
+      </div>
+
+      <div class="ring sixth-ring" id="sixthRing">
+        <div class="ring-bg"></div>
+        <div class="ring-lines"></div>
+        <div class="ring-labels" id="sixthLabels"></div>
+      </div>
+
       <div class="center-orb" id="centerOrb" title="Hold to charge spin. Release to spin.">
         <div id="wheelTitle" class="center-wheel-title">Wheel</div>
         <div class="power-bar-shell">
@@ -149,6 +190,6 @@
     <div id="spinSpiralLayer" class="spin-spiral-layer"></div>
   </main>
 
-  <script src="app.js?v=1.2"></script>
+  <script src="app.js?v=1.3"></script>
 </body>
 </html>
