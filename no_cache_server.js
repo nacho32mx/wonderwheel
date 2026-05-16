@@ -8,7 +8,13 @@ const types = {
   ".html": "text/html; charset=utf-8",
   ".js": "application/javascript",
   ".css": "text/css",
-  ".txt": "text/plain; charset=utf-8"
+  ".txt": "text/plain; charset=utf-8",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml"
 };
 
 function send(res, status, body, type = "text/plain; charset=utf-8") {

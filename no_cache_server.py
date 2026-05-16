@@ -21,6 +21,12 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         ".js": "application/javascript",
         ".css": "text/css",
         ".html": "text/html; charset=utf-8",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".webp": "image/webp",
+        ".gif": "image/gif",
+        ".svg": "image/svg+xml",
     }
 
     def end_headers(self):

@@ -4,17 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wonder Wheel Spinner</title>
-  <link rel="stylesheet" href="styles.css?v=1.3">
+  <link rel="stylesheet" href="styles.css?v=1.17.1">
 </head>
 <body class="wheel-body">
   <div class="top-left-actions">
-    <a class="utility-link" href="dashboard.html">Dashboard</a>
-    <button id="editWheelButton" class="utility-link" type="button">Edit Wheel</button>
+    <a class="utility-link icon-button" href="dashboard.html" aria-label="Dashboard" title="Dashboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+    </a>
   </div>
-  <div class="version-badge">Wonder Wheel v1.3</div>
-
+  <div class="top-tool-actions">
+    <label class="icon-toggle" title="Rings">
+      <input id="hideWheelLinesInput" type="checkbox" checked aria-label="Rings">
+      <span class="toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r="1.5"></circle></svg></span>
+    </label>
+    <label class="icon-toggle" title="Spokes">
+      <input id="hideSectionLinesInput" type="checkbox" checked aria-label="Spokes">
+      <span class="toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 4v16"></path><path d="M4 12h16"></path><path d="m6.3 6.3 11.4 11.4"></path><path d="m17.7 6.3-11.4 11.4"></path></svg></span>
+    </label>
+    <label class="icon-toggle" title="Text">
+      <input id="hideWheelTextInput" type="checkbox" aria-label="Text">
+      <span class="toggle-icon text-toggle-icon" aria-hidden="true">Aa</span>
+    </label>
+    <label class="icon-toggle" title="Audio">
+      <input id="allowSoundInput" type="checkbox" aria-label="Audio">
+      <span class="toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4H4Z"></path><path d="M17 9a5 5 0 0 1 0 6"></path><path d="M19.5 6.5a8.5 8.5 0 0 1 0 11"></path></svg></span>
+    </label>
+    <button id="editWheelButton" class="icon-button" type="button" aria-label="Edit wheel" title="Edit wheel">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.24.35.6.58 1 .6h.6a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15Z"></path></svg>
+    </button>
+    <button id="toggleCompletionLog" class="icon-button" type="button" aria-label="Show spins" title="Show spins">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path><path d="M10 13h6"></path><path d="M10 17h6"></path></svg>
+    </button>
+  </div>
+  <div class="top-right-actions">
+    <button id="resetViewButton" class="utility-link icon-button" type="button" aria-label="Reset view" title="Reset view">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"></path><path d="M21 3v6h-6"></path></svg>
+    </button>
+  </div>
   <section id="selectedPanel" class="selected-panel draggable-panel">
-    <div class="panel-handle">Selected</div>
+    <div class="panel-heading compact-panel-heading selected-panel-heading">
+      <div>
+        <div id="wheelTitle" class="selected-wheel-title panel-handle">Wheel</div>
+      </div>
+      <div class="selected-actions">
+        <button id="copySelectedButton" class="icon-button" type="button" aria-label="Copy all" title="Copy all">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></svg>
+        </button>
+      </div>
+    </div>
     <div class="selected-grid">
       <div id="selectedOuterBox"><span>Ring 1</span><strong id="selectedOuter">—</strong></div>
       <div id="selectedMiddleBox"><span>Ring 2</span><strong id="selectedMiddle">—</strong></div>
@@ -22,26 +59,29 @@
       <div id="selectedCoreBox" class="hidden"><span>Ring 4</span><strong id="selectedCore">—</strong></div>
       <div id="selectedFifthBox" class="hidden"><span>Ring 5</span><strong id="selectedFifth">-</strong></div>
       <div id="selectedSixthBox" class="hidden"><span>Ring 6</span><strong id="selectedSixth">-</strong></div>
-    </div>
-    <div id="latestSpinPanel" class="latest-spin-panel hidden">
-      <h3>Latest Spin</h3>
-      <div id="latestSpinRows" class="latest-spin-rows"></div>
+      <div id="selectedSeventhBox" class="hidden"><span>Ring 7</span><strong id="selectedSeventh">-</strong></div>
+      <div id="selectedEighthBox" class="hidden"><span>Ring 8</span><strong id="selectedEighth">-</strong></div>
+      <div id="selectedNinthBox" class="hidden"><span>Ring 9</span><strong id="selectedNinth">-</strong></div>
+      <div id="selectedTenthBox" class="hidden"><span>Ring 10</span><strong id="selectedTenth">-</strong></div>
     </div>
   </section>
 
-  <section id="completionPanel" class="completion-panel draggable-panel">
+  <section id="completionPanel" class="completion-panel draggable-panel collapsed">
     <div class="panel-heading compact-panel-heading">
       <div>
-        <div class="panel-handle">Completed</div>
-        <p id="completionSummary">0 / 0</p>
+        <div class="panel-handle">Spin Log</div>
+        <p id="completionSummary">0 spins</p>
       </div>
       <div class="completion-actions">
-        <button id="toggleCompletionLog" type="button">Hide</button>
-        <button id="resetCompletionLog" type="button">Reset</button>
+        <button id="downloadCompletionLog" class="icon-button" type="button" aria-label="Download spin log" title="Download spin log">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg>
+        </button>
+        <button id="resetCompletionLog" class="icon-button" type="button" aria-label="Clear spin log" title="Clear spin log">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M6 6l1 15h10l1-15"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+        </button>
       </div>
     </div>
     <div id="completionBody" class="completion-body">
-      <label class="checkbox-row"><input id="preventRepeatSelections" type="checkbox"> Prevent repeat selections</label>
       <ol id="completionLog" class="completion-log"></ol>
     </div>
   </section>
@@ -61,78 +101,115 @@
           <option value="4">4 rings</option>
           <option value="5">5 rings</option>
           <option value="6">6 rings</option>
+          <option value="7">7 rings</option>
+          <option value="8">8 rings</option>
+          <option value="9">9 rings</option>
+          <option value="10">10 rings</option>
         </select>
       </label>
-      <label>Theme
-        <select id="themeSelect">
-          <option value="lightning">Lightning</option>
-          <option value="plant">Plant</option>
-          <option value="steel">Steel</option>
-          <option value="fire">Fire</option>
-          <option value="earth">Earth</option>
-          <option value="water">Water</option>
-          <option value="flowers">Flowers</option>
+      <label>Wheel style
+        <select id="wheelFrameSelect">
+          <option value="none">None</option>
+          <option value="classic-glow">Space</option>
+          <option value="arcane">Arcane</option>
+          <option value="steampunk">Steampunk</option>
+          <option value="neon-circuit">Neon Circuit</option>
+          <option value="nature">Koi Pond</option>
+          <option value="custom">Custom</option>
         </select>
       </label>
+      <label id="customWheelStyleImageLabel" class="hidden">Custom style image <input id="customWheelStyleImageInput" type="file" accept="image/*"></label>
+      <button id="clearCustomWheelStyleImage" class="compact-editor-button hidden" type="button">Clear Custom Style</button>
       <label>Wheel line color <input id="wheelColorInput" type="color"></label>
       <label>Interface color <input id="interfaceColorInput" type="color"></label>
       <label>Text color <input id="textColorInput" type="color"></label>
       <label>Page background color <input id="pageBgInput" type="color"></label>
-      <label>Full page background image <input id="pageBgImageInput" type="file" accept="image/*"></label>
-      <button id="clearPageBgImage" class="compact-editor-button" type="button">Clear Background</button>
-      <label>Wheel size <input id="wheelSizeInput" type="range" min="0.45" max="3" step="0.025"></label>
-      <label class="checkbox-row editor-checkbox"><input id="allowAnimationsInput" type="checkbox"> Allow animations</label>
-      <label>Center background <input id="centerBgInput" type="file" accept="image/*"></label>
-      <button id="clearCenterBg" class="compact-editor-button" type="button">Clear Background</button>
+      <label class="editor-checkbox"><input id="preventRepeatSelections" type="checkbox"> Prevent repeat combinations</label>
+      <label id="pageBgImageLabel" class="hidden">Full page background image <input id="pageBgImageInput" type="file" accept="image/*"></label>
+      <button id="clearPageBgImage" class="compact-editor-button hidden" type="button">Clear Background</button>
+      <label id="centerBgLabel" class="hidden">Center background <input id="centerBgInput" type="file" accept="image/*"></label>
+      <button id="clearCenterBg" class="compact-editor-button hidden" type="button">Clear Background</button>
     </div>
     <div class="editor-ring-grid">
       <div id="outerEditorCard" class="editor-ring-card">
-        <h3>Outer Ring</h3>
-        <label>Slices <input id="outerCountInput" type="number" min="1" max="12"></label>
+        <h3>Ring 1</h3>
+        <label>Slices <select id="outerCountInput"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
         <label>Prompt <input id="outerPromptInput" type="text" placeholder="Example: tell a story"></label>
+        <label>Context before selection <input id="outerContextInput" type="text" placeholder="Example: "></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="outerLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="outerLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
         <div id="outerNamesEditor" class="name-editor-list"></div>
-        <label>Background <input id="outerBgInput" type="file" accept="image/*"></label>
-        <button id="clearOuterBg" type="button">Clear Background</button>
       </div>
       <div id="middleEditorCard" class="editor-ring-card">
-        <h3>Middle Ring</h3>
-        <label>Slices <input id="middleCountInput" type="number" min="1" max="12"></label>
+        <h3>Ring 2</h3>
+        <label>Slices <select id="middleCountInput"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
         <label>Prompt <input id="middlePromptInput" type="text" placeholder="Example: remember"></label>
+        <label>Context before selection <input id="middleContextInput" type="text" placeholder="Example: is"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="middleLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="middleLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
         <div id="middleNamesEditor" class="name-editor-list"></div>
-        <label>Background <input id="middleBgInput" type="file" accept="image/*"></label>
-        <button id="clearMiddleBg" type="button">Clear Background</button>
       </div>
       <div id="innerEditorCard" class="editor-ring-card">
-        <h3>Inner Ring</h3>
-        <label>Slices <input id="innerCountInput" type="number" min="1" max="12"></label>
+        <h3>Ring 3</h3>
+        <label>Slices <select id="innerCountInput"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
         <label>Prompt <input id="innerPromptInput" type="text" placeholder="Example: with gratitude"></label>
+        <label>Context before selection <input id="innerContextInput" type="text" placeholder="Example: using"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="innerLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="innerLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
         <div id="innerNamesEditor" class="name-editor-list"></div>
-        <label>Background <input id="innerBgInput" type="file" accept="image/*"></label>
-        <button id="clearInnerBg" type="button">Clear Background</button>
       </div>
       <div id="coreEditorCard" class="editor-ring-card">
-        <h3>Core Ring</h3>
-        <label>Slices <input id="coreCountInput" type="number" min="1" max="12"></label>
+        <h3>Ring 4</h3>
+        <label>Slices <select id="coreCountInput"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
         <label>Prompt <input id="corePromptInput" type="text" placeholder="Example: today"></label>
+        <label>Context before selection <input id="coreContextInput" type="text" placeholder="Example: with"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="coreLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="coreLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
         <div id="coreNamesEditor" class="name-editor-list"></div>
-        <label>Background <input id="coreBgInput" type="file" accept="image/*"></label>
-        <button id="clearCoreBg" type="button">Clear Background</button>
       </div>
       <div id="fifthEditorCard" class="editor-ring-card">
         <h3>Ring 5</h3>
-        <label>Slices <input id="fifthCountInput" type="number" min="1" max="12"></label>
+        <label>Slices <select id="fifthCountInput"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
         <label>Prompt <input id="fifthPromptInput" type="text" placeholder="Example: in a new way"></label>
+        <label>Context before selection <input id="fifthContextInput" type="text" placeholder="Example: with"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="fifthLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="fifthLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
         <div id="fifthNamesEditor" class="name-editor-list"></div>
-        <label>Background <input id="fifthBgInput" type="file" accept="image/*"></label>
-        <button id="clearFifthBg" type="button">Clear Background</button>
       </div>
       <div id="sixthEditorCard" class="editor-ring-card">
         <h3>Ring 6</h3>
-        <label>Slices <input id="sixthCountInput" type="number" min="1" max="12"></label>
+        <label>Slices <select id="sixthCountInput"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></label>
         <label>Prompt <input id="sixthPromptInput" type="text" placeholder="Example: before bedtime"></label>
+        <label>Context before selection <input id="sixthContextInput" type="text" placeholder="Example: with"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="sixthLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="sixthLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
         <div id="sixthNamesEditor" class="name-editor-list"></div>
-        <label>Background <input id="sixthBgInput" type="file" accept="image/*"></label>
-        <button id="clearSixthBg" type="button">Clear Background</button>
+      </div>
+      <div id="seventhEditorCard" class="editor-ring-card">
+        <h3>Ring 7</h3>
+        <label>Slices <select id="seventhCountInput"></select></label>
+        <label>Prompt <input id="seventhPromptInput" type="text" placeholder="Example: with a twist"></label>
+        <label>Context before selection <input id="seventhContextInput" type="text" placeholder="Example: with"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="seventhLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="seventhLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
+        <div id="seventhNamesEditor" class="name-editor-list"></div>
+      </div>
+      <div id="eighthEditorCard" class="editor-ring-card">
+        <h3>Ring 8</h3>
+        <label>Slices <select id="eighthCountInput"></select></label>
+        <label>Prompt <input id="eighthPromptInput" type="text" placeholder="Example: in this style"></label>
+        <label>Context before selection <input id="eighthContextInput" type="text" placeholder="Example: with"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="eighthLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="eighthLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
+        <div id="eighthNamesEditor" class="name-editor-list"></div>
+      </div>
+      <div id="ninthEditorCard" class="editor-ring-card">
+        <h3>Ring 9</h3>
+        <label>Slices <select id="ninthCountInput"></select></label>
+        <label>Prompt <input id="ninthPromptInput" type="text" placeholder="Example: add detail"></label>
+        <label>Context before selection <input id="ninthContextInput" type="text" placeholder="Example: with"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="ninthLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="ninthLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
+        <div id="ninthNamesEditor" class="name-editor-list"></div>
+      </div>
+      <div id="tenthEditorCard" class="editor-ring-card">
+        <h3>Ring 10</h3>
+        <label>Slices <select id="tenthCountInput"></select></label>
+        <label>Prompt <input id="tenthPromptInput" type="text" placeholder="Example: final modifier"></label>
+        <label>Context before selection <input id="tenthContextInput" type="text" placeholder="Example: with"></label>
+        <div class="selection-limit-row"><label class="checkbox-row"><input id="tenthLimitEnabledInput" type="checkbox"> Limit selection count</label><label>Max <input id="tenthLimitCountInput" type="number" min="1" max="10" value="1"></label></div>
+        <div id="tenthNamesEditor" class="name-editor-list"></div>
       </div>
     </div>
     <button id="saveEditorButton" class="primary-button" type="button">Save Changes</button>
@@ -141,7 +218,7 @@
   <main class="wheel-stage" id="wheelStage">
     <div class="compass" id="compass">
       <div class="compass-selection-arrow" aria-hidden="true"></div>
-      <div id="themeSpiralEffect" class="theme-spiral-effect" aria-hidden="true"></div>
+      <div class="wheel-bg-layer" aria-hidden="true"></div>
       <div class="ring outer-ring" id="outerRing">
         <div class="ring-bg"></div>
         <div class="ring-lines"></div>
@@ -178,18 +255,35 @@
         <div class="ring-labels" id="sixthLabels"></div>
       </div>
 
-      <div class="center-orb" id="centerOrb" title="Hold to charge spin. Release to spin.">
-        <div id="wheelTitle" class="center-wheel-title">Wheel</div>
-        <div class="power-bar-shell">
-          <div id="powerBarFill" class="power-bar-fill"></div>
-        </div>
+      <div class="ring seventh-ring" id="seventhRing">
+        <div class="ring-bg"></div>
+        <div class="ring-lines"></div>
+        <div class="ring-labels" id="seventhLabels"></div>
       </div>
-      <button id="wheelMoveHandle" class="wheel-move-handle" type="button" title="Drag to move wheel" aria-label="Drag to move wheel">↕</button>
-      <button id="wheelCornerResizeHandle" class="wheel-corner-resize-handle" type="button" title="Drag to resize wheel" aria-label="Drag to resize wheel"></button>
+
+      <div class="ring eighth-ring" id="eighthRing">
+        <div class="ring-bg"></div>
+        <div class="ring-lines"></div>
+        <div class="ring-labels" id="eighthLabels"></div>
+      </div>
+
+      <div class="ring ninth-ring" id="ninthRing">
+        <div class="ring-bg"></div>
+        <div class="ring-lines"></div>
+        <div class="ring-labels" id="ninthLabels"></div>
+      </div>
+
+      <div class="ring tenth-ring" id="tenthRing">
+        <div class="ring-bg"></div>
+        <div class="ring-lines"></div>
+        <div class="ring-labels" id="tenthLabels"></div>
+      </div>
+
+      <div class="center-orb" id="centerOrb" title="Hold to charge spin. Release to spin."></div>
     </div>
     <div id="spinSpiralLayer" class="spin-spiral-layer"></div>
   </main>
 
-  <script src="app.js?v=1.3"></script>
+  <script src="app.js?v=1.17.1"></script>
 </body>
 </html>

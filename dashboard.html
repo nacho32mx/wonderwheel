@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wonder Wheel Dashboard</title>
-  <link rel="stylesheet" href="styles.css?v=1.3">
+  <link rel="stylesheet" href="styles.css?v=1.17.1">
 </head>
 <body class="dashboard-body">
   <main class="dashboard-shell">
@@ -12,22 +12,22 @@
       <div>
         <p class="kicker">Custom Spinner Tool</p>
         <h1>Wonder Wheel</h1>
-        <p class="version-inline">Wonder Wheel v1.3</p>
+        <p class="version-inline">Wonder Wheel v1.17</p>
         <p>Build, customize, and spin multi-ring wheels for games, prompts, choices, and storytelling.</p>
       </div>
       <div class="dashboard-header-actions">
         <button id="aboutButton" type="button">About</button>
         <button id="dashboardCustomizeToggle" type="button">Customize</button>
+        <button id="importWheelButton" type="button">Import Wheel</button>
+        <input id="importWheelInput" class="hidden" type="file" accept="application/json,.json">
         <a class="primary-link" href="setup.html?mode=new">Build New Wheel</a>
       </div>
     </header>
 
     <section id="dashboardCustomizePanel" class="dashboard-customize-panel hidden">
-      <h2>Dashboard Colors</h2>
+      <h2>Dashboard Customize</h2>
       <div class="control-row wrap">
-        <label>Table color <input type="color" id="dashboardTableColor" value="#ffd700"></label>
-        <label>Interface color <input type="color" id="dashboardInterfaceColor" value="#ffd700"></label>
-        <label>Background color <input type="color" id="dashboardBgColor" value="#111111"></label>
+        <label>Interface color <input type="color" id="dashboardInterfaceColor" value="#ffffff"></label>
         <label>Background image <input type="file" id="dashboardBgImage" accept="image/*"></label>
         <button id="clearDashboardBgImage" type="button">Clear Background Image</button>
         <button id="resetDashboardColors" type="button">Reset</button>
@@ -60,6 +60,6 @@
     </div>
   </div>
 
-  <script src="dashboard.js?v=1.3"></script>
+  <script src="dashboard.js?v=1.17.2"></script>
 </body>
 </html>
